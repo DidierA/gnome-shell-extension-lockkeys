@@ -81,6 +81,8 @@ const LockKeysIndicator = GObject.registerClass({
             Main.extensionManager.openExtensionPrefs('lockkeys@vaina.lt', '', {});
         });
 
+		this.procLauncher = null ; // will be used to launch subprocesses if script action is enabled
+
         this.indicatorStyle = new HighlightIndicatorStyle(this);
     }
 
@@ -123,7 +125,31 @@ const LockKeysIndicator = GObject.registerClass({
             this.showNotification(notification_text, icon_name);
 		}
 
+		// execShell must be called before updateState, to reflect changes in the key states.
+		try {
+			this.execShell([ 'bash', '-c', '~/.config/lockkeys.sh'])
+		} catch (e) {
+			console.log('Error while launching shell: ' + e)
+		}
+
 		this.updateState();
+	}
+
+	execShell(args) {
+		if (this.procLauncher == null) {
+			this.procLauncher = new Gio.SubprocessLauncher({
+				flags: Gio.SubprocessFlags.NONE,
+			}) ;
+		}
+		// set previous and current state in environment variables
+		this.procLauncher.setenv('CAPSLOCK', this.getStateText(this.getCapslockState()), true)
+		this.procLauncher.setenv('CAPSLOCK_PREV', this.getStateText(this.capslock_state), true)
+		this.procLauncher.setenv('NUMLOCK', this.getStateText(this.getNumlockState()), true)
+		this.procLauncher.setenv('NUMLOCK_PREV', this.getStateText(this.numlock_state), true)
+		this.procLauncher.setenv('LOCKKEYS_NOTIFICATIONS', this.config.settings.get_string(NOTIFICATIONS), true)
+		this.procLauncher.setenv('LOCKKEYS_STYLE', this.config.settings.get_string(STYLE), true)
+
+		this.procLauncher.spawnv(args) ;
 	}
 
 	updateState() {

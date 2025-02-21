@@ -1,8 +1,10 @@
+import Gio from 'gi://Gio';
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+import * as Const from './const.js' ;
 
 const STYLE = 'style';
 const STYLE_NONE = 'none';
@@ -54,7 +56,30 @@ export default class LockKeysPreferences extends ExtensionPreferences {
     	    }
     	);
 
-        return this.createVerticalBoxCompat(indicator_style, notifications_style);
+        // checkbox : enable script
+        const enable_script = this.createSwitchRow(
+            Const.ENABLE_SCRIPT,
+            _('Enable script'),
+            _('If active, the script will be launched on each change of caps-lock or num-lock (not used yet)'),
+        );
+
+        // TODO: add script path selection pref (Adw.EntryRow https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1-latest/class.EntryRow.html)
+        // File chooser  Gtk.FileDialog() ?
+
+        return this.createVerticalBoxCompat(indicator_style, notifications_style, enable_script);
+    }
+
+    createSwitchRow(key, title, subtitle) {
+        let result = new Adw.SwitchRow({
+            title: title,
+            subtitle: subtitle,
+        });
+        result.halign = Gtk.Align.FILL;
+
+        const _settings = this.getSettings();
+        _settings.bind(key, result, 'active', Gio.SettingsBindFlags.DEFAULT);
+
+        return result ;
     }
 
     createComboBox(key, text, tooltip, values) {

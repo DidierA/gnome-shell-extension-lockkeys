@@ -9,6 +9,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
+import * as Const from './const.js' ;
 
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
@@ -126,10 +127,12 @@ const LockKeysIndicator = GObject.registerClass({
 		}
 
 		// execShell must be called before updateState, to reflect changes in the key states.
-		try {
-			this.execShell([ 'bash', '-c', '~/.config/lockkeys.sh'])
-		} catch (e) {
-			console.log('Error while launching shell: ' + e)
+		if (this.config.isScriptEnabled()) {
+			try {
+				this.execShell([ 'bash', '-c', '~/.config/lockkeys.sh'])
+			} catch (e) {
+				console.log('Error while launching shell: ' + e)
+			}
 		}
 
 		this.updateState();
@@ -401,5 +404,9 @@ const Configuration = GObject.registerClass({
 	isVisibilityStyleCapslock() {
 		let widget_style = this.settings.get_string(STYLE);
 		return widget_style == STYLE_SHOWHIDE_CAPSLOCK;
+	}
+
+	isScriptEnabled() {
+		return this.settings.get_boolean(Const.ENABLE_SCRIPT) ;
 	}
 });

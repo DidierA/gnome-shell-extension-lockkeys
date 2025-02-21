@@ -14,5 +14,13 @@
 				set capslock value to display only caps-lock indicator, or both for
 				both. Set show-hide, to display corresponding indicator icons only when on.</description>
 		</key>
+		<key name="enable-script" type="b">
+			<default>false</default>
+			<summary>Launch script on caps-lock / num-lock change</summary>
+		</key>
+		<key name="script-path" type="s">
+			<default>'~/.config/lockkeys.sh'</default>
+			<summary>Path to the script to be launched</summary>
+		</key>
 	</schema>
 </schemalist>

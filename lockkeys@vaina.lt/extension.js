@@ -129,7 +129,7 @@ const LockKeysIndicator = GObject.registerClass({
 		// execShell must be called before updateState, to reflect changes in the key states.
 		if (this.config.isScriptEnabled()) {
 			try {
-				this.execShell([ 'bash', '-c', '~/.config/lockkeys.sh'])
+				this.execShell([ 'bash', '-c', this.config.getScriptPath()])
 			} catch (e) {
 				console.log('Error while launching shell: ' + e)
 			}
@@ -408,5 +408,9 @@ const Configuration = GObject.registerClass({
 
 	isScriptEnabled() {
 		return this.settings.get_boolean(Const.ENABLE_SCRIPT) ;
+	}
+
+	getScriptPath() {
+		return this.settings.get_string(Const.SCRIPT_PATH) ;
 	}
 });

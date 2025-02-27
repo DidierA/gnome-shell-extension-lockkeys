@@ -5,6 +5,7 @@ import Gtk from 'gi://Gtk';
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
 import * as Const from './const.js' ;
+import * as Utils from './Util.js' ;
 
 const STYLE = 'style';
 const STYLE_NONE = 'none';
@@ -60,26 +61,88 @@ export default class LockKeysPreferences extends ExtensionPreferences {
         const enable_script = this.createSwitchRow(
             Const.ENABLE_SCRIPT,
             _('Enable script'),
-            _('If active, the script will be launched on each change of caps-lock or num-lock (not used yet)'),
+            _('If active, the script will be launched on each change of caps-lock or num-lock')
         );
 
-        // TODO: add script path selection pref (Adw.EntryRow https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1-latest/class.EntryRow.html)
         // File chooser  Gtk.FileDialog() ?
-
-        return this.createVerticalBoxCompat(indicator_style, notifications_style, enable_script);
+        const script_path = this.createEntryRow(
+            Const.SCRIPT_PATH,
+            _('Script path'),
+            _('Path to the script to launch on each change of caps-lock or num-lock')
+        );
+        
+        return this.createVerticalBoxCompat(indicator_style, notifications_style, enable_script, script_path);
     }
 
-    createSwitchRow(key, title, subtitle) {
-        let result = new Adw.SwitchRow({
-            title: title,
-            subtitle: subtitle,
-        });
-        result.halign = Gtk.Align.FILL;
-
+    createEntryRow(key, text, tooltip) {
+        let label = new Gtk.Label({ label: text, xalign: 0, tooltip_text:tooltip });
         const _settings = this.getSettings();
-        _settings.bind(key, result, 'active', Gio.SettingsBindFlags.DEFAULT);
+        const prev_value = _settings.get_string(key);
 
-        return result ;
+        let widget = new Gtk.Entry() ;
+        widget.set_text(prev_value);
+        widget.halign = Gtk.Align.FILL;
+
+        // called when enter key is pressed
+        // TODO: better handling 
+        widget.connect('activate', function(entry_widget) {
+            const prev_value = _settings.get_string(key);
+            
+            let path=widget.get_text() ;
+            
+            // Check that the entry is a valid file
+            let file=Gio.File.new_for_path(path) ;
+            // console.log('Path: ' + file.get_path()) ;
+            if (! file.query_exists(null)) {
+                const dne_dialog = Utils.createAlertDialog(
+                    entry_widget,
+                    _('File does not exist!'),
+                    'File' + file.get_path() + ' does not exist',
+                );
+                dne_dialog.present(entry_widget);
+                entry_widget.set_text(prev_value) ;
+                return ;
+            }
+
+            const file_info=file.query_info("*",Gio.FileQueryInfoFlags.NONE,null);
+            
+            //for ( const attr of file_info.list_attributes(null)) {
+            //    console.log(attr + ':' + file_info.get_attribute_as_string(attr)) ;
+            //}
+
+            // Chekc if file is executable
+            if (! file_info.get_attribute_boolean("access::can-execute")) {
+                const ine_dialog = Utils.createAlertDialog(
+                    entry_widget,
+                    _('File is not executable!'),
+                    'File' + file.get_path() + ' is not executable',
+                );
+                ine_dialog.present(entry_widget);
+                entry_widget.set_text(prev_value) ;
+                return ;
+            }
+            
+            let icon=file_info.get_icon() ; // returns Gio.icon
+            entry_widget.set_icon_from_gicon(Gtk.EntryIconPosition.PRIMARY, icon) ;
+            //entry_widget.set_icon_sensitive(Gtk.EntryIconPosition.PRIMARY);
+            
+            _settings.set_string(key,widget.get_text()) ;
+        });
+
+        return this.createHorizontalBoxCompat(label, widget);
+    }
+
+    createSwitchRow(key, text, tooltip) {
+        let label = new Gtk.Label({ label: text, xalign: 0, tooltip_text:tooltip });
+        const _settings = this.getSettings();
+
+        let widget = new Gtk.Switch({active: _settings.get_boolean(key)});
+        widget.connect('notify::active', function(switch_widget) {
+            _settings.set_boolean(key, widget.active);
+        });
+        widget.halign = Gtk.Align.END;
+
+        return this.createHorizontalBoxCompat(label, widget);
     }
 
     createComboBox(key, text, tooltip, values) {

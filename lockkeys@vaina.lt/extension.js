@@ -15,18 +15,6 @@ import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/ex
 
 const POST_46 = parseFloat(Config.PACKAGE_VERSION) >= 46;
 
-const STYLE = 'style';
-const STYLE_NONE = 'none';
-const STYLE_NUMLOCK_ONLY = 'numlock';
-const STYLE_CAPSLOCK_ONLY = 'capslock';
-const STYLE_BOTH = 'both';
-const STYLE_SHOWHIDE = 'show-hide';
-const STYLE_SHOWHIDE_CAPSLOCK = 'show-hide-capslock';
-const NOTIFICATIONS = 'notification-preferences';
-const NOTIFICATIONS_OFF = 'off';
-const NOTIFICATIONS_ON = 'on';
-const NOTIFICATIONS_OSD = 'osd';
-
 export default class LockKeysExtension extends Extension {
     enable() {
         const config = new Configuration(this.getSettings());
@@ -90,7 +78,7 @@ const LockKeysIndicator = GObject.registerClass({
 	setActive(enabled) {
 		if (enabled) {
 			this._keyboardStateChangedId = this.keyMap.connect('state-changed', this.handleStateChange.bind(this));
-			this._settingsChangedId = this.config.settings.connect('changed::' + STYLE, this.handleSettingsChange.bind(this));
+			this._settingsChangedId = this.config.settings.connect('changed::' + Const.STYLE, this.handleSettingsChange.bind(this));
 			this._iconThemeChangedId = this.icons.iconTheme.connect('changed', this.handleSettingsChange.bind(this));
 			this.handleSettingsChange();
 		} else {
@@ -149,8 +137,8 @@ const LockKeysIndicator = GObject.registerClass({
 		this.procLauncher.setenv('CAPSLOCK_PREV', this.getStateText(this.capslock_state), true)
 		this.procLauncher.setenv('NUMLOCK', this.getStateText(this.getNumlockState()), true)
 		this.procLauncher.setenv('NUMLOCK_PREV', this.getStateText(this.numlock_state), true)
-		this.procLauncher.setenv('LOCKKEYS_NOTIFICATIONS', this.config.settings.get_string(NOTIFICATIONS), true)
-		this.procLauncher.setenv('LOCKKEYS_STYLE', this.config.settings.get_string(STYLE), true)
+		this.procLauncher.setenv('LOCKKEYS_NOTIFICATIONS', this.config.settings.get_string(Const.NOTIFICATIONS), true)
+		this.procLauncher.setenv('LOCKKEYS_STYLE', this.config.settings.get_string(Const.STYLE), true)
 
 		this.procLauncher.spawnv(args) ;
 	}
@@ -365,45 +353,45 @@ const Configuration = GObject.registerClass({
 	}
 
 	isShowNotifications() {
-		let notification_prefs = this.settings.get_string(NOTIFICATIONS);
-		return notification_prefs == NOTIFICATIONS_ON || notification_prefs == NOTIFICATIONS_OSD;
+		let notification_prefs = this.settings.get_string(Const.NOTIFICATIONS);
+		return notification_prefs == Const.NOTIFICATIONS_ON || notification_prefs == Const.NOTIFICATIONS_OSD;
 	}
 
 	isShowOsd() {
-		let notification_prefs = this.settings.get_string(NOTIFICATIONS);
-		return notification_prefs == NOTIFICATIONS_OSD;
+		let notification_prefs = this.settings.get_string(Const.NOTIFICATIONS);
+		return notification_prefs == Const.NOTIFICATIONS_OSD;
 	}
 
 	isNotifyNumLock() {
-        let widget_style = this.settings.get_string(STYLE);
+        let widget_style = this.settings.get_string(Const.STYLE);
         return this.isShowNotifications() &&
-            widget_style != STYLE_CAPSLOCK_ONLY &&
-            widget_style != STYLE_SHOWHIDE_CAPSLOCK;
+            widget_style != Const.STYLE_CAPSLOCK_ONLY &&
+            widget_style != Const.STYLE_SHOWHIDE_CAPSLOCK;
     }
 
 	isNotifyCapsLock() {
-		let widget_style = this.settings.get_string(STYLE);
-		return this.isShowNotifications() && widget_style != STYLE_NUMLOCK_ONLY;
+		let widget_style = this.settings.get_string(Const.STYLE);
+		return this.isShowNotifications() && widget_style != Const.STYLE_NUMLOCK_ONLY;
 	}
 
 	isHighlightNumLock() {
-        let widget_style = this.settings.get_string(STYLE);
-        return widget_style == STYLE_BOTH || widget_style == STYLE_NUMLOCK_ONLY;
+        let widget_style = this.settings.get_string(Const.STYLE);
+        return widget_style == Const.STYLE_BOTH || widget_style == Const.STYLE_NUMLOCK_ONLY;
     }
 
     isHighlightCapsLock() {
-        let widget_style = this.settings.get_string(STYLE);
-        return widget_style == STYLE_BOTH || widget_style == STYLE_CAPSLOCK_ONLY;
+        let widget_style = this.settings.get_string(Const.STYLE);
+        return widget_style == Const.STYLE_BOTH || widget_style == Const.STYLE_CAPSLOCK_ONLY;
     }
 
 	isVisibilityStyle() {
-		let widget_style = this.settings.get_string(STYLE);
-		return widget_style == STYLE_SHOWHIDE;
+		let widget_style = this.settings.get_string(Const.STYLE);
+		return widget_style == Const.STYLE_SHOWHIDE;
 	}
 
 	isVisibilityStyleCapslock() {
-		let widget_style = this.settings.get_string(STYLE);
-		return widget_style == STYLE_SHOWHIDE_CAPSLOCK;
+		let widget_style = this.settings.get_string(Const.STYLE);
+		return widget_style == Const.STYLE_SHOWHIDE_CAPSLOCK;
 	}
 
 	isScriptEnabled() {

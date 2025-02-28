@@ -7,18 +7,6 @@ import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.j
 import * as Const from './const.js' ;
 import * as Utils from './Util.js' ;
 
-const STYLE = 'style';
-const STYLE_NONE = 'none';
-const STYLE_NUMLOCK_ONLY = 'numlock';
-const STYLE_CAPSLOCK_ONLY = 'capslock';
-const STYLE_BOTH = 'both';
-const STYLE_SHOWHIDE = 'show-hide';
-const STYLE_SHOWHIDE_CAPSLOCK = 'show-hide-capslock';
-const NOTIFICATIONS = 'notification-preferences';
-const NOTIFICATIONS_OFF = 'off';
-const NOTIFICATIONS_ON = 'on';
-const NOTIFICATIONS_OSD = 'osd';
-
 export default class LockKeysPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) { // window is an ExtensionPrefsDialog
         //console.log(window) ;
@@ -38,27 +26,27 @@ export default class LockKeysPreferences extends ExtensionPreferences {
 
     buildPrefsWidget() {
     	const indicator_style = this.createComboBox(
-    	    STYLE,
+    	    Const.STYLE,
     	    _("Indicator Style"),
     	    _("Change indicator display options"),
     	    {
-                [STYLE_NONE]: _("Notifications Only"),
-                [STYLE_NUMLOCK_ONLY]: _("Num-Lock Only"),
-                [STYLE_CAPSLOCK_ONLY]: _("Caps-Lock Only"),
-                [STYLE_BOTH]: _("Both"),
-                [STYLE_SHOWHIDE]: _("Show/Hide"),
-                [STYLE_SHOWHIDE_CAPSLOCK]: _("Show/Hide Caps-Lock Only")
+                [Const.STYLE_NONE]: _("Notifications Only"),
+                [Const.STYLE_NUMLOCK_ONLY]: _("Num-Lock Only"),
+                [Const.STYLE_CAPSLOCK_ONLY]: _("Caps-Lock Only"),
+                [Const.STYLE_BOTH]: _("Both"),
+                [Const.STYLE_SHOWHIDE]: _("Show/Hide"),
+                [Const.STYLE_SHOWHIDE_CAPSLOCK]: _("Show/Hide Caps-Lock Only")
     	    }
     	);
 
     	const notifications_style = this.createComboBox(
-    	    NOTIFICATIONS,
+    	    Const.NOTIFICATIONS,
     	    _("Notifications"),
     	    _("Show notifications when state changes"),
     	    {
-                [NOTIFICATIONS_OFF]: _("Off"),
-                [NOTIFICATIONS_ON]: _("Compact"),
-                [NOTIFICATIONS_OSD]: _("Osd")
+                [Const.NOTIFICATIONS_OFF]: _("Off"),
+                [Const.NOTIFICATIONS_ON]: _("Compact"),
+                [Const.NOTIFICATIONS_OSD]: _("Osd")
     	    }
     	);
 

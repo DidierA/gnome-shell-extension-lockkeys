@@ -1,2 +1,13 @@
 export const ENABLE_SCRIPT = 'enable-script';
-export const   SCRIPT_PATH = 'script-path' ;
+export const SCRIPT_PATH = 'script-path' ;
+export const STYLE = 'style';
+export const STYLE_NONE = 'none';
+export const STYLE_NUMLOCK_ONLY = 'numlock';
+export const STYLE_CAPSLOCK_ONLY = 'capslock';
+export const STYLE_BOTH = 'both';
+export const STYLE_SHOWHIDE = 'show-hide';
+export const STYLE_SHOWHIDE_CAPSLOCK = 'show-hide-capslock';
+export const NOTIFICATIONS = 'notification-preferences';
+export const NOTIFICATIONS_OFF = 'off';
+export const NOTIFICATIONS_ON = 'on';
+export const NOTIFICATIONS_OSD = 'osd';
